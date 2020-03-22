@@ -1,31 +1,31 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import './style.css'
-import App from './App'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './style.css';
+import App from './App';
 
 import {
   ApolloClient,
   HttpLink,
   InMemoryCache,
-  ApolloProvider
-} from '@apollo/client'
+  ApolloProvider,
+} from '@apollo/client';
 
-const cache = new InMemoryCache()
+const cache = new InMemoryCache();
 
 const link = new HttpLink({
-  uri: '/.netlify/functions/graphql'
-})
+  uri: '/.netlify/functions/graphql',
+});
 
 const client = new ApolloClient({
   cache,
-  link
+  link,
   // resolvers
-})
+});
 
 const Root = () => (
   <ApolloProvider client={client}>
     <App />
   </ApolloProvider>
-)
+);
 
-ReactDOM.render(<Root />, document.getElementById('root'))
+ReactDOM.render(<Root />, document.getElementById('root'));

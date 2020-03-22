@@ -1,8 +1,8 @@
-const { gql } = require('apollo-server-lambda')
-const cookie = require('cookie')
-const faunadb = require('faunadb')
+const { gql } = require('apollo-server-lambda');
+const cookie = require('cookie');
+const faunadb = require('faunadb');
 
-const q = faunadb.query
+const q = faunadb.query;
 
 const overrideTypeDefs = gql`
   input LoginInput {
@@ -13,20 +13,20 @@ const overrideTypeDefs = gql`
   type Mutation {
     login(data: LoginInput): String! @resolver(name: "login")
   }
-`
+`;
 
 const createOverrideResolvers = (remoteExecutableSchema) => ({
   Mutation: {
     login: async (root, args, context, info) => {
-      console.log('*** OVERRIDE mutation login')
+      console.log('*** OVERRIDE mutation login');
 
       // short circuit if cookie exists
       if (context.event.headers.cookie) {
-        const parsedCookie = cookie.parse(context.event.headers.cookie)
-        const cookieSecret = parsedCookie['fauna-token']
+        const parsedCookie = cookie.parse(context.event.headers.cookie);
+        const cookieSecret = parsedCookie['fauna-token'];
         const userClient = new faunadb.Client({
-          secret: cookieSecret
-        })
+          secret: cookieSecret,
+        });
         const alreadyLoggedIn = await userClient
           .query(q.Get(q.Identity()))
           .then((response) => {
@@ -34,21 +34,21 @@ const createOverrideResolvers = (remoteExecutableSchema) => ({
               if (args.data && args.data.email && args.data.email) {
                 // TODO trying to log in as someone else besides cookie holder.
                 // should probably log them out first!
-                return response.data.email === args.data.email
+                return response.data.email === args.data.email;
               } else {
                 // did not provide credentials so just use the cookie values
-                return true
+                return true;
               }
             }
-            return false
+            return false;
           })
           .catch((e) => {
-            console.log('error: bad cookie secret', e)
-            return false
-          })
+            console.log('error: bad cookie secret', e);
+            return false;
+          });
 
         if (alreadyLoggedIn) {
-          return true
+          return true;
         } else {
           // kill the cookie
           context.setCookies.push({
@@ -56,14 +56,14 @@ const createOverrideResolvers = (remoteExecutableSchema) => ({
             value: '',
             options: {
               httpOnly: true,
-              expires: new Date()
-            }
-          })
+              expires: new Date(),
+            },
+          });
         }
-        return false
+        return false;
       }
 
-      if (!args.data || !args.data.email || !args.data.email) return false
+      if (!args.data || !args.data.email || !args.data.email) return false;
 
       const result = await info.mergeInfo
         .delegateToSchema({
@@ -72,30 +72,30 @@ const createOverrideResolvers = (remoteExecutableSchema) => ({
           fieldName: 'login',
           args,
           context,
-          info
+          info,
         })
         .catch((error) => {
-          console.log(error)
-        })
+          console.log(error);
+        });
       if (result) {
         context.setCookies.push({
           name: 'fauna-token',
           value: result,
           options: {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production'
-          }
-        })
-        return true
+            secure: process.env.NODE_ENV === 'production',
+          },
+        });
+        return true;
       }
-      return false
+      return false;
     },
     logout: async (root, args, context, info) => {
-      console.log('*** OVERRIDE mutation logout')
+      console.log('*** OVERRIDE mutation logout');
 
       // short circuit if NO cookie exists
       if (!context.event.headers.cookie) {
-        return true
+        return true;
       }
 
       await info.mergeInfo
@@ -105,11 +105,11 @@ const createOverrideResolvers = (remoteExecutableSchema) => ({
           fieldName: 'logout',
           args,
           context,
-          info
+          info,
         })
         .catch((error) => {
-          console.log(error)
-        })
+          console.log(error);
+        });
 
       // kill the cookie
       context.setCookies.push({
@@ -117,16 +117,16 @@ const createOverrideResolvers = (remoteExecutableSchema) => ({
         value: '',
         options: {
           httpOnly: true,
-          expires: new Date()
-        }
-      })
+          expires: new Date(),
+        },
+      });
 
-      return true
-    }
-  }
-})
+      return true;
+    },
+  },
+});
 
 module.exports = {
   overrideTypeDefs,
-  createOverrideResolvers
-}
+  createOverrideResolvers,
+};

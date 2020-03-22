@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 export const useCheckBox = (initialValue, options) => {
-  const [checked, setValue] = useState(initialValue)
+  const [checked, setValue] = useState(initialValue);
 
   return {
     checked,
@@ -10,9 +10,9 @@ export const useCheckBox = (initialValue, options) => {
     bind: {
       checked,
       onChange: (event) => {
-        setValue(event.target.checked)
-        if (options?.onChange) options.onChange(event.target.checked)
-      }
-    }
-  }
-}
+        setValue(event.target.checked);
+        if (options?.onChange) options.onChange(event.target.checked);
+      },
+    },
+  };
+};

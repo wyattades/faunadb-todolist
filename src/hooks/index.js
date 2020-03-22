@@ -1,2 +1,2 @@
-export { useInput } from './useInput'
-export { useCheckBox } from './useCheckBox'
+export { useInput } from './useInput';
+export { useCheckBox } from './useCheckBox';

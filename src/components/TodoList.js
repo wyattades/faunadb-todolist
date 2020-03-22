@@ -1,30 +1,30 @@
-import React, { useState } from 'react'
-import { useQuery, useMutation, gql } from '@apollo/client'
-import { Editor, EditorState, ContentState } from 'draft-js'
+import React, { useState } from 'react';
+import { useQuery, useMutation, gql } from '@apollo/client';
+import { Editor, EditorState, ContentState } from 'draft-js';
 
-import { GET_ME } from '../graphql/query'
-import { UPDATE_TODO, DELETE_TODO } from '../graphql/mutations'
+import { GET_ME } from '../graphql/query';
+import { UPDATE_TODO, DELETE_TODO } from '../graphql/mutations';
 
-import { useCheckBox } from '../hooks'
+import { useCheckBox } from '../hooks';
 
 const TodoItem = ({ todo }) => {
-  const { _id, title, completed } = todo
+  const { _id, title, completed } = todo;
 
-  const [runUpdateTodoMutation] = useMutation(UPDATE_TODO)
-  const [runDeleteTodoMutation] = useMutation(DELETE_TODO)
+  const [runUpdateTodoMutation] = useMutation(UPDATE_TODO);
+  const [runDeleteTodoMutation] = useMutation(DELETE_TODO);
 
   const [editorState, setEditorState] = useState(
-    EditorState.createWithContent(ContentState.createFromText(title))
-  )
+    EditorState.createWithContent(ContentState.createFromText(title)),
+  );
 
-  const onTitleEditorChange = (editorState) => setEditorState(editorState)
+  const onTitleEditorChange = (editorState) => setEditorState(editorState);
 
   const onTitleEditorBlur = () => {
-    const newTitle = editorState.getCurrentContent().getPlainText()
+    const newTitle = editorState.getCurrentContent().getPlainText();
     const variables = {
       data: { title: newTitle, completed },
-      id: _id
-    }
+      id: _id,
+    };
     runUpdateTodoMutation({
       variables,
       update(cache, { data }) {
@@ -38,16 +38,16 @@ const TodoItem = ({ todo }) => {
               completed
             }
           `,
-          data
-        })
-      }
-    })
-  }
+          data,
+        });
+      },
+    });
+  };
   const handleUpdate = (newData) => {
     const variables = {
       data: Object.assign({ title, completed }, newData),
-      id: _id
-    }
+      id: _id,
+    };
     runUpdateTodoMutation({
       variables,
       update(cache, { data }) {
@@ -61,48 +61,48 @@ const TodoItem = ({ todo }) => {
               completed
             }
           `,
-          data
-        })
-      }
-    })
-  }
+          data,
+        });
+      },
+    });
+  };
 
   const handleDelete = () => {
     const variables = {
-      id: _id
-    }
+      id: _id,
+    };
     runDeleteTodoMutation({
       variables,
       update(cache) {
-        const meCache = cache.readQuery({ query: GET_ME })
-        const existingTodos = meCache?.me?.todos?.data
-        const filteredTodos = existingTodos.filter((todo) => todo._id !== _id)
+        const meCache = cache.readQuery({ query: GET_ME });
+        const existingTodos = meCache?.me?.todos?.data;
+        const filteredTodos = existingTodos.filter((todo) => todo._id !== _id);
 
         const newCache = {
           me: {
             ...meCache?.me,
             todos: {
               __typename: 'TodoPage',
-              data: filteredTodos
-            }
-          }
-        }
+              data: filteredTodos,
+            },
+          },
+        };
 
-        cache.writeQuery({ query: GET_ME, data: newCache })
-      }
-    })
-  }
+        cache.writeQuery({ query: GET_ME, data: newCache });
+      },
+    });
+  };
 
   const checkState = useCheckBox(completed, {
-    onChange: (checked) => handleUpdate({ completed: checked })
-  })
+    onChange: (checked) => handleUpdate({ completed: checked }),
+  });
 
   return (
     <div className={'todo-item' + (completed ? ' todo-checked' : '')}>
       <label>
-        <input type='checkbox' {...checkState.bind} />
+        <input type="checkbox" {...checkState.bind} />
       </label>
-      <div className='todo-item-title'>
+      <div className="todo-item-title">
         <Editor
           editorState={editorState}
           onChange={onTitleEditorChange}
@@ -110,19 +110,19 @@ const TodoItem = ({ todo }) => {
         ></Editor>
       </div>
 
-      <button className='btn-danger' onClick={handleDelete}>
+      <button className="btn-danger" onClick={handleDelete}>
         delete
       </button>
-      <div className='todo-empty-space'></div>
+      <div className="todo-empty-space"></div>
     </div>
-  )
-}
+  );
+};
 
 const TodoList = () => {
-  const { data: myTodosData, loading: myTodosLoading } = useQuery(GET_ME)
+  const { data: myTodosData, loading: myTodosLoading } = useQuery(GET_ME);
 
   return (
-    <div className='todo-list'>
+    <div className="todo-list">
       {!myTodosLoading && myTodosData ? (
         <ul>
           {myTodosData.me.todos.data.map((todo) => (
@@ -135,7 +135,7 @@ const TodoList = () => {
         <p>loading</p>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default TodoList
+export default TodoList;

@@ -1,10 +1,10 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client';
 
 export const GET_LOGGED_IN = gql`
   query GetLoggedIn {
     loggedIn
   }
-`
+`;
 
 export const GET_ME = gql`
   query GetMyTodos {
@@ -22,4 +22,4 @@ export const GET_ME = gql`
       }
     }
   }
-`
+`;

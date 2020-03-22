@@ -137,9 +137,8 @@ input UserTodosRelation {
   # Disconnect the given documents of type 'Todo' from the current document using their IDs.
   disconnect: [ID]
 }
-`
+`;
 
 module.exports = {
-  remoteTypeDefs
-}
-
+  remoteTypeDefs,
+};

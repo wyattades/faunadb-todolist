@@ -1,16 +1,16 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client';
 
 export const LOGIN = gql`
   mutation Login($data: LoginInput!) {
     login(data: $data)
   }
-`
+`;
 
 export const LOGOUT = gql`
   mutation Logout {
     logout
   }
-`
+`;
 
 export const USER_CREATE_TODO = gql`
   mutation UserCreateTodo($data: UserTodoInput!) {
@@ -21,7 +21,7 @@ export const USER_CREATE_TODO = gql`
       completed
     }
   }
-`
+`;
 
 export const UPDATE_TODO = gql`
   mutation UpdateTodo($id: ID!, $data: TodoInput!) {
@@ -32,7 +32,7 @@ export const UPDATE_TODO = gql`
       completed
     }
   }
-`
+`;
 
 export const DELETE_TODO = gql`
   mutation DeleteTodo($id: ID!) {
@@ -40,4 +40,4 @@ export const DELETE_TODO = gql`
       _id
     }
   }
-`
+`;
